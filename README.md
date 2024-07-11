@@ -1,5 +1,3 @@
----
-
 # Next.js Project Bootstrapped with `create-next-app`
 
 ## Getting Started
