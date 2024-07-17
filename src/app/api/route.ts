@@ -1,5 +1,6 @@
 import {google} from 'googleapis';
-import { NextResponse } from "next/server";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 type SheetForm={
     name: string;
     email: string;
@@ -7,49 +8,61 @@ type SheetForm={
     message: string;
 }
 
-export async function GET() {
-    return NextResponse.json({  message: 'Only POST requests are allowed' });
-}
-export async function POST(request: Request,response:Response) {
+// export async function GET() {
+//     return NextResponse.json({  message: 'Only POST requests are allowed' });
+// }
 
-    if (request.method !== 'POST') {
-        // return response.status().send({ message: 'Only POST requests are allowed' });
-        return response.status(405).send({ message: 'Only POST requests are allowed' });
-    }
-    const body = request.body as SheetForm;
 
-        try {
-            //prepare auth
+export async function POST(
+req: NextRequest
+) {
 
-            const auth = new google.auth.GoogleAuth({
-                credentials:{
-                    client_email:process.env.GOOGLE_CLIENT_EMAIL,
-                    private_key:process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n')
-                },
-                scopes:[
-                    'https://www.googleapis.com/auth/spreadsheets',
-                    'https://www.googleapis.com/auth/drive.file',
-                    'https://www.googleapis.com/auth/drive'
-                ]
-            })
-            const sheets = google.sheets({version:'v4',auth});
 
-            const response = await sheets.spreadsheets.values.append({
-                spreadsheetId:process.env.SHEET_ID,
-                range:'A1:D1',
-                valueInputOption:'USER_ENTERED',
-                requestBody:{
-                    values:[
-                        [body.name,body.email,body.phone,body.message]
-                    ]
-                }
-               
-            });
-            return res.status(200).json({data:response.data})
-            
-        } catch (error) {
-             
-            console.log(error)
-            return res.status(500).send({message:'Internal Server Error'})
+const body = await req.json() as SheetForm;
+try {
+    const auth = new google.auth.GoogleAuth({
+        credentials: {
+            client_email: process.env.GOOGLE_CLIENT_EMAIL,
+            private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+        },
+        scopes: [
+            'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/drive.file',
+            'https://www.googleapis.com/auth/spreadsheets'
+        ]
+    })
+
+    const sheets = google.sheets({
+        auth,
+        version: 'v4',
+    });
+
+    const response = await sheets.spreadsheets.values.append({
+        spreadsheetId: process.env.GOOGLE_SHEET_ID,
+        range: 'A1:D1',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+            values: [
+                [body.name, body.email, body.phone, body.message]
+            ]
         }
+    });
+
+    return new Response(JSON.stringify({message: 'Success', data: response.data}), {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        status:201,
+    })
+}
+catch (e) {
+    return new NextResponse(JSON.stringify({message: 'Error', error: e}), {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        status:500,
+    })
+
+}
+
 }
