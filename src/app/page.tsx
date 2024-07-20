@@ -1,19 +1,54 @@
 "use client";
 import SpreadsheetIcon from "@/components/ui/SpreadsheetIcon";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { Toaster } from "@/components/ui/toaster";
+import { FaCheck } from "react-icons/fa";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 interface FormData {
   name: string;
   email: string;
   phone: string;
   message: string;
 }
+const SuccessToast = () => (
+  <div className="flex items-center justify-between">
+    <p className="text-sm flex gap-2">
+      <FaCheck className="text-white" /> Your message has been sent
+      successfully!
+    </p>
+  </div>
+);
 
 const Home: NextPage = () => {
-  const handleSubmit = async () => {
+  const { toast } = useToast();
+
+  const checkFormData = (formData: FormData) => {
+    if (formData.name === "") {
+      return false;
+    }
+    if (formData.email === "") {
+      return false;
+    }
+    if (formData.phone === "") {
+      return false;
+    }
+    if (formData.message === "") {
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!checkFormData(formData)) {
+      return;
+    }
     setIsSubmitting(true);
-    const data = {
+    const data: FormData = {
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
@@ -93,54 +128,45 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      setTimeout(() => {
-        setIsSuccess(false);
-      }, 3000);
+      toast({
+        description: <SuccessToast />,
+        className: "bg-green-500 text-white",
+      }),
+        setTimeout(() => {
+          setIsSuccess(false);
+        }, 3000);
     }
-  }, [isSuccess]);
+  }, [isSuccess, toast]);
 
   return isSubmitting ? (
     <div className="flex max-w-md flex-col gap-4 items-center justify-center m-auto h-screen">
-      <span className="loading loading-spinner loading-lg"></span>
+      <div
+        className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-[#332d2d] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+        role="status"
+      >
+        <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+          Loading...
+        </span>
+      </div>
     </div>
   ) : (
     <>
-      {isSuccess && (
-        <div className="toast toast-top toast-end transition-all ease-in-out">
-          <div className="alert alert-success text-white">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 shrink-0 stroke-current"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>Data sent to google sheet successfully.</span>
-          </div>
-        </div>
-      )}
-      <main className="bg-gray-100 flex items-center justify-center min-h-screen">
-        <div className="w-full max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+      <main className=" flex items-center justify-center min-h-screen  bg-muted/40">
+        <Card className="w-full max-w-md mx-auto p-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center dark:text-foreground">
             Paste and send to <SpreadsheetIcon />
           </h2>
           <div>
-            <label
+            <Label
               htmlFor="data"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-md font-medium text-foreground"
             >
               Data
-            </label>
+            </Label>
             <div>
               <textarea
                 name="data"
-                className="text-black mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm min-h-52"
+                className="text-black mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm min-h-52 dark:text-foreground"
                 value={textareaValue}
                 onChange={handleTextareaChange}
                 required
@@ -152,7 +178,7 @@ const Home: NextPage = () => {
                 <p>Message: {formData.message}</p>
               </div> */}
               <div className="flex gap-2 justify-center mt-2">
-                <Button onClick={handleSubmit} variant={"default"}>
+                <Button onClick={handleSubmit} variant={"secondary"}>
                   Submit
                 </Button>
                 <Button onClick={handleReset} variant={"destructive"}>
@@ -161,8 +187,9 @@ const Home: NextPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
       </main>
+      <Toaster />
     </>
   );
 };
