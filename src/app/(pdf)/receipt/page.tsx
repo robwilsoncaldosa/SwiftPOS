@@ -1,6 +1,7 @@
-/* eslint-disable react/no-deprecated */
 "use client";
-import PDFDocument from "@/components/ui/Document";
+import LayoutReceiptPDF from "@/components/ui/LayoutReceipt";
+
+/* eslint-disable react/no-deprecated */
 import ReactPDF, {
   Page,
   Text,
@@ -10,13 +11,10 @@ import ReactPDF, {
   PDFViewer,
 } from "@react-pdf/renderer";
 
-// Create Document Component
-const MyDocument = () => <PDFDocument />;
-
 const PDFPage = () => {
   return (
     <PDFViewer style={styles.page}>
-      <MyDocument />
+      <LayoutReceiptPDF />
     </PDFViewer>
   );
 };
@@ -29,7 +27,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "flex-start",
-    height: "100vh",
+    height: "90vh",
     width: "100%",
   },
   section: {

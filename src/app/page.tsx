@@ -8,11 +8,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { FaCheck } from "react-icons/fa";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-interface FormData {
+import LayoutOrder from "@/components/ui/LayoutOrder";
+export interface FormData {
   name: string;
-  email: string;
-  phone: string;
-  message: string;
+  amount: string;
+  page: string;
+  admin: string;
+  artist: string;
+  jobOrder?: string;
 }
 const SuccessToast = () => (
   <div className="flex items-center justify-between">
@@ -30,13 +33,16 @@ const Home: NextPage = () => {
     if (formData.name === "") {
       return false;
     }
-    if (formData.email === "") {
+    if (formData.amount === "") {
       return false;
     }
-    if (formData.phone === "") {
+    if (formData.admin === "") {
       return false;
     }
-    if (formData.message === "") {
+    if (formData.artist === "") {
+      return false;
+    }
+    if (formData.page === "") {
       return false;
     }
     return true;
@@ -50,9 +56,10 @@ const Home: NextPage = () => {
     setIsSubmitting(true);
     const data: FormData = {
       name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      message: formData.message,
+      amount: formData.amount,
+      admin: formData.admin,
+      artist: formData.artist,
+      page: formData.page,
     };
 
     try {
@@ -76,9 +83,10 @@ const Home: NextPage = () => {
   const [textareaValue, setTextareaValue] = useState<string>("");
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    email: "",
-    phone: "",
-    message: "",
+    amount: "",
+    admin: "",
+    artist: "",
+    page: "",
   });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
@@ -87,9 +95,10 @@ const Home: NextPage = () => {
     setTextareaValue("");
     setFormData({
       name: "",
-      email: "",
-      phone: "",
-      message: "",
+      amount: "",
+      admin: "",
+      artist: "",
+      page: "",
     });
   };
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -97,23 +106,32 @@ const Home: NextPage = () => {
     setTextareaValue(value);
 
     const parsedData: Partial<FormData> = {};
-    const regex = /(name|email|phone|message)\s*:\s*([^,\n]+)/gi;
+    const regex =
+      /(Name of client|Amount|Assigned admin|Assigned artist|Page)\s*:\s*([^\n]+)/gi;
     let match;
     while ((match = regex.exec(value)) !== null) {
       const key = match[1].toLowerCase();
       const val = match[2].trim();
       switch (key) {
-        case "name":
+        case "name of client":
           parsedData.name = val;
+          console.log(val);
           break;
-        case "email":
-          parsedData.email = val;
+        case "amount":
+          parsedData.amount = val;
+          console.log(val);
           break;
-        case "phone":
-          parsedData.phone = val;
+        case "page":
+          parsedData.page = val;
+          console.log(val);
           break;
-        case "message":
-          parsedData.message = val;
+        case "assigned admin":
+          parsedData.admin = val;
+          console.log(val);
+          break;
+        case "assigned artist":
+          parsedData.artist = val;
+          console.log(val);
           break;
         default:
           break;
@@ -151,8 +169,8 @@ const Home: NextPage = () => {
     </div>
   ) : (
     <>
-      <main className=" flex items-center justify-center min-h-screen  bg-muted/40">
-        <Card className="w-full max-w-md mx-auto p-8">
+      <main className=" flex items-center w-full  min-h-screen  bg-muted/40">
+        <Card className="w-full max-w-md mx-auto  p-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center dark:text-foreground">
             Paste and send to <SpreadsheetIcon />
           </h2>
@@ -178,7 +196,7 @@ const Home: NextPage = () => {
                 <p>Message: {formData.message}</p>
               </div> */}
               <div className="flex gap-2 justify-center mt-2">
-                <Button onClick={handleSubmit} variant={"secondary"}>
+                <Button onClick={handleSubmit} variant={"default"}>
                   Submit
                 </Button>
                 <Button onClick={handleReset} variant={"destructive"}>
