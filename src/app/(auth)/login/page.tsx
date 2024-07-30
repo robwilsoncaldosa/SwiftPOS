@@ -4,8 +4,17 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-export function Login() {
+import { handleLogin } from "@/app/api/route";
+export async function Login() {
+  const handleAuth = async (formData: FormData) => {
+    "use server";
+    const username = formData.get("username")?.toString();
+    const password = formData.get("password")?.toString();
+    if (!username || !password) {
+      return;
+    }
+    return await handleLogin(username, password);
+  };
   return (
     <div className="w-full  lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[951px]">
       <div className="flex items-center justify-center py-12">
@@ -16,21 +25,23 @@ export function Login() {
               Enter your username below to login to your account
             </p>
           </div>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" type="text" required />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
+          <form action={handleAuth}>
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="username">Username</Label>
+                <Input id="username" type="text" required />
               </div>
-              <Input id="password" type="password" required />
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                </div>
+                <Input id="password" type="password" required />
+              </div>
+              <Button type="submit" className="w-full" asChild>
+                <Link href={"/"}>Login</Link>
+              </Button>
             </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-          </div>
+          </form>
         </div>
       </div>
       <div className="hidden bg-muted lg:block">

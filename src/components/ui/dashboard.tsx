@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   Bell,
   CircleUser,
@@ -33,11 +32,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PropsWithChildren } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./dialog";
+
+import { HomePage } from "@/app/HomePage";
 
 interface DashboardProps extends PropsWithChildren {}
 export function Dashboard({ children }: DashboardProps) {
-  const pathname = usePathname();
-
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -87,6 +94,41 @@ export function Dashboard({ children }: DashboardProps) {
               </Link>
             </nav>
           </div>
+          <Card className=" text-card-foreground m-4">
+            <CardHeader className="p-2 pt-0 md:p-4">
+              <CardTitle className="text-pretty">Layout Form</CardTitle>
+              <CardDescription>Click to Add Layout Form</CardDescription>
+            </CardHeader>
+            <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="w-full">
+                    Add Layout
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Layout Form</DialogTitle>
+                    <DialogDescription>
+                      Just Copy and Paste the Layout Form
+                    </DialogDescription>
+                  </DialogHeader>
+                  <HomePage />
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
+          <Card className=" text-card-foreground m-4">
+            <CardHeader className="p-2 pt-0 md:p-4">
+              <CardTitle className="text-pretty">Generate Docs</CardTitle>
+              <CardDescription>Click to Generate Document</CardDescription>
+            </CardHeader>
+            <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
+              <Button size="sm" className="w-full" asChild>
+                <Link href={"/image"}>Generate</Link>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
       <div className="flex flex-col">
@@ -190,7 +232,9 @@ export function Dashboard({ children }: DashboardProps) {
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href={"/login"}>Logout</Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>

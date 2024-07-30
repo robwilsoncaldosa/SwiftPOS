@@ -120,21 +120,3 @@ export async function POST(req: NextRequest) {
     }
   );
 }
-
-export const handleLogin = async (username: string, password: string) => {
-  const username1 = "ADMIN1";
-  const password1 = "PASSWORD1";
-  const username2 = "ADMIN2";
-  const password2 = "PASSWORD2";
-  const username3 = "ADMIN3";
-  const password3 = "PASSWORD3";
-
-  const usernames = username1 || username2 || username3;
-  const passwords = password1 || password2 || password3;
-
-  if (username === usernames && password === passwords) {
-    cookies().set("currentUser", username);
-  } else {
-    return alert("Invalid Username or Password");
-  }
-};
