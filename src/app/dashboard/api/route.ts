@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
-import { FormData } from "../HomePage";
+import { FormData } from "../../HomePage";
 import { cookies } from "next/headers";
 
 const createSheetsClient = async () => {
@@ -70,10 +70,13 @@ export async function GET() {
   const data = response.data.values?.map((row) => ({
     jobOrder: row[0],
     name: row[1],
-    amount: row[2],
-    page: row[3],
-    admin: row[4],
-    artist: row[5],
+    phone: row[2],
+    address: row[3],
+    page: row[4],
+    admin: row[5],
+    products:row[6],
+    total:row[7],
+    date:row[8]
   }));
 
   return new Response(JSON.stringify(data), {
@@ -84,7 +87,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as FormData;
+  const body = (await req.json()) as any;
 
   const sheets = await createSheetsClient();
   const nextJobOrder = await getNextJobOrder(
@@ -101,10 +104,13 @@ export async function POST(req: NextRequest) {
         [
           nextJobOrder,
           body.name,
-          body.amount,
+          body.phone,
+          body.address,
           body.page,
           body.admin,
-          body.artist,
+          body.products,
+          body.total,
+          body.date
         ],
       ],
     },

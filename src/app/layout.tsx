@@ -1,9 +1,13 @@
+import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import "./globals.css";
-import { GeistSans } from "geist/font/sans";
-import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "next-themes";
-import Dashboard from "@/components/ui/dashboard";
+
+// const UserProvider = dynamic(
+//   async () => (await import("@/components/UserProvider")).UserProvider,
+//   {
+//     ssr: false,
+//   }
+// );
 
 export const metadata: Metadata = {
   title: "SwiftPOS",
@@ -14,18 +18,12 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) { 
+
   return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <body className={GeistSans.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
+    <html lang="en" suppressHydrationWarning={true} className={GeistSans.className}>
+      <body className='antialiased'>
           {children}
-        </ThemeProvider>
       </body>
     </html>
   );

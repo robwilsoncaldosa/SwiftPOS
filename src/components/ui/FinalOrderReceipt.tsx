@@ -1,6 +1,7 @@
 "use client";
 /* eslint-disable jsx-a11y/alt-text */
 import { FormData } from "@/app/HomePage";
+import { Item } from "@radix-ui/react-dropdown-menu";
 import ReactPDF, {
   Page,
   Text,
@@ -13,24 +14,17 @@ import ReactPDF, {
 import { useSearchParams } from "next/navigation";
 
 Font.register({
-  family: "Geist",
+  family: "Inter",
   fonts: [
-    { src: "/fonts/sans/Geist-Regular.ttf" },
-    { src: "/fonts/sans/Geist-Bold.ttf", fontWeight: "bold" },
+    { src: "/fonts/Inter/static/Inter_24pt-Regular.ttf" },
+    { src: "/fonts/Inter/static/Inter_24pt-Bold.ttf", fontWeight: "bold" },
+    { src: "/fonts/Inter/static/Inter_24pt-Medium.ttf", fontWeight: "medium" },
     {
-      src: "/fonts/sans/Geist-Light.ttf",
-      fontWeight: "light",
+      src: "/fonts/Inter/static/Inter_24pt-SemiBold.ttf",
+      fontWeight: "semibold",
     },
-    { src: "/fonts/sans/Geist-Medium.ttf", fontWeight: "medium" },
-    { src: "/fonts/sans/Geist-SemiBold.ttf", fontWeight: "semibold" },
+    { src: "/fonts/Inter/static/Inter_24pt-Light.ttf", fontWeight: "light" },
   ],
-});
-
-Font.registerEmojiSource({
-  format: "png",
-  url: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/",
-  // url: 'https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.0.1/img/apple/64/',
-  // withVariationSelectors: true,
 });
 
 // Create styles
@@ -39,19 +33,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 10,
     flexWrap: "wrap",
-    fontFamily: "Geist",
+    fontFamily: "Inter",
     color: "#09090b",
     fontSize: 10,
     fontWeight: "light",
   },
   section: {
     flexGrow: 1,
-    width: "50%",
-    maxWidth: "50%",
+    width: "48%",
+    maxWidth: "48%",
     border: 1,
     borderColor: "#e4e4e7",
     // borderRadius: "12px",
     color: "#09090b",
+    margin: 1,
   },
   header: {
     fontSize: 14,
@@ -67,93 +62,76 @@ const styles = StyleSheet.create({
   },
   Container: {
     display: "flex",
-    padding: 14,
+    padding: 16,
     flexDirection: "column",
-    backgroundColor:'white',
-    gap: 12,
+    backgroundColor: "white",
+    gap: 7,
   },
-  articlesHeader: {
+  Header: {
     fontSize: 10,
-    fontWeight: "semibold",
+    fontWeight: "medium",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   items: {
     color: "#71717a",
-    fontWeight: "medium",
+    fontWeight: 100,
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   total: {
-    fontFamily: "Geist",
-    fontSize:11,
-    fontWeight: "bold",
-    color:'#71717a',
+    fontFamily: "Inter",
+    fontSize: 11,
+    fontWeight: "extrabold",
+    color: "#71717a",
     flexDirection: "row",
   },
-  price: {
+  value: {
     marginLeft: "auto",
-    fontWeight: "light",
     color: "#09090b",
   },
   separator: {
-    height: 1,
+    height: 0.7,
     backgroundColor: "#e4e4e7",
     marginVertical: 10,
   },
 });
 
-// Helper function to get today's date
-const getTodayDate = () => {
-  const today = new Date();
-  return `${today.toLocaleString("default", {
-    month: "long",
-  })} ${today.getDate()}, ${today.getFullYear()}`;
-};
+interface FinalOrderData extends FormData {
+    "subtotal":string
+    "shipping-fee":string
+    "package-box":string
+    "total-cost":string
+    "down-payment":string
+    "layout-fee":string
+    "remaining-balance":string
+    "jobOrder":string
+    "date":string
+}
 
-// Sample data
-const names = ["Joey Albonu Jr."];
-const addresses = ["LPG Household and Industrial Gases"];
-const randomJobOrder = `F-9052`;
-
-const defaultData: FormData = {
-  admin: "admin",
-  amount: "amount",
-  artist: "artist",
-  jobOrder: "jobOrder",
-  name: "name",
-  page: "page",
-};
-
-export const Rows = ({ amount }: { amount: string }) => {
-  const iterations = 6;
-  const rows = [];
-
-  for (let i = 0; i < iterations; i++) {
-    rows.push(
-      <View key={i} style={{}}>
-        <View style={{}}>
-          <Text style={{}}></Text>
-        </View>
-        <View style={{}}>
-          <Text style={{}}></Text>
-        </View>
-        <View style={{}}>
-          <Text style={{}}>{i === 0 ? "Layout Fee" : ""}</Text>
-        </View>
-        <View style={{}}>
-          <Text style={{}}>{i === 0 ? amount : i === 5 ? "TOTAL" : ""}</Text>
-        </View>
-        <View style={{}}>
-          <Text style={{}}>{i === 0 ? "500" : i === 5 ? "500" : ""}</Text>
-        </View>
-      </View>
-    );
-  }
-
-  return <>{rows}</>;
-};
-
-function FinalOrderReceipt({ data }: { data: FormData }) {
+function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
+  // Extract the keys from the data object that match the pattern for products
+  const products = Object.keys(data)
+    .filter((key) => key.startsWith("product") && !key.startsWith("products"))
+    .map((key) => {
+      const index = key.replace("product", "");
+      return {
+        //@ts-ignore
+        product: data[`product${index}`],
+        //@ts-ignore
+        size: data[`size${index}`],
+        //@ts-ignore
+        price: data[`price${index}`],
+        //@ts-ignore
+        quantity: data[`quantity${index}`],
+        //@ts-ignore
+        total: data[`total${index}`],
+      };
+    });
+  console.log(products);
   return (
-    <Document style={{ width: "100%", height: "100%" }}>
+    <Document style={{ width: "100%", height: "100%" }} title="Final Receipt">
       <Page size={"LEGAL"} style={styles.page}>
         {Array.from({ length: 1 }).map((_, ic) => (
           <View key={ic} style={styles.section} wrap>
@@ -166,10 +144,10 @@ function FinalOrderReceipt({ data }: { data: FormData }) {
                   },
                 ]}
               >
-                Layout&nbsp;
+                Order&nbsp;
                 <Text
                   style={{
-                    fontFamily: "Geist",
+                    fontFamily: "Inter",
                     fontWeight: "bold",
                     letterSpacing: "-.8px",
                   }}
@@ -191,35 +169,106 @@ function FinalOrderReceipt({ data }: { data: FormData }) {
                     fontWeight: "light",
                   }}
                 >
-                  {getTodayDate()}
+                  {data.date}
                 </Text>
               </Text>
             </View>
 
             <View style={styles.Container}>
-              <View style={styles.articlesHeader}>
-                <Text>ARTICLES</Text>
+              <View style={styles.Header}>
+                <Text>Products</Text>
+                <Text>Sizes</Text>
+                <Text>Price</Text>
+                <Text>Quantity</Text>
+                <Text>Total</Text>
               </View>
-              <View style={styles.items}>
-                <Text>Polo Shirt x 2 </Text>
-                <Text style={styles.price}> $500.00 </Text>
+              {products.map((item, index) => (
+
+              <View key={index} style={styles.items}>
+                  <View
+                    key={index}
+                    style={{ flexDirection: "row", alignItems: "center" }}
+                  >
+                    <Text style={{ flexBasis: 60, marginRight: 50 }}>
+                      {item.product}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "#09090b",
+                        flexBasis: 30,
+                      }}
+                    >
+                      {item.size}
+                    </Text>
+                    <Text style={{ color: "#09090b", marginRight:70,marginLeft:25 }}>
+                      ₱{item.price}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "#09090b",
+                        flexBasis: 20,
+                        marginRight: 20,
+                      }}
+                    >
+                      {item.quantity}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "#09090b",
+                        flexBasis: 30,
+                        marginRight: 20,
+                      }}
+                    >
+                      ₱{item.total}
+                    </Text>
+                  </View>
               </View>
+                ))}
+
               <View style={styles.separator}></View>
               <View style={styles.items}>
-                <Text>SubTotal</Text>
-                <Text style={styles.price}> $500.00 </Text>
+                <Text style={{ marginRight: "auto" }}>SubTotal</Text>
+                <Text style={styles.value}>₱{data.subtotal}</Text>
               </View>
               <View style={styles.items}>
-                <Text>Shipping</Text>
-                <Text style={styles.price}> $5.00 </Text>
+                <Text style={{ marginRight: "auto" }}>Shipping</Text>
+                <Text style={styles.value}>₱{data['shipping-fee']}</Text>
               </View>
               <View style={styles.items}>
-                <Text>Package Box</Text>
-                <Text style={styles.price}> $30.00 </Text>
+                <Text style={{ marginRight: "auto" }}>
+                  Package Box - Medium
+                </Text>
+                <Text style={styles.value}>₱{data['package-box']}</Text>
               </View>
+              <View style={styles.items}>
+                <Text style={{ marginRight: "auto" }}>Total</Text>
+                <Text style={styles.value}>₱{data['total-cost']}</Text>
+              </View>
+              <View style={styles.items}>
+                <Text>Downpayment</Text>
+                <Text
+                  style={[styles.value, { color: "red", fontWeight: "medium" }]}
+                >
+                  - ₱{data['down-payment']}
+                </Text>
+              </View>
+              {data['layout-fee'] === '0' ? null : (
+              <View style={styles.items}>
+                
+              <Text>Layout Fee - Paid</Text>
+              <Text
+                style={[styles.value, { color: "red", fontWeight: "medium" }]}
+              >
+                - ₱{data['layout-fee']}
+              </Text>
+            </View>
+              )}
+              
               <View style={styles.total}>
-                <Text>Total</Text>
-                <Text style={[styles.price,{fontWeight:'semibold',fontSize:10}]}> $500.00 </Text>
+                <Text>Remaining Balance</Text>
+                <Text style={[styles.value, { fontSize: 10, color: "black" }]}>
+                ₱{data['remaining-balance']}
+                </Text>
               </View>
               <View style={styles.separator}></View>
             </View>
@@ -247,7 +296,6 @@ function FinalOrderReceipt({ data }: { data: FormData }) {
               <Text
                 style={{
                   fontSize: 10,
-                  marginTop: 20,
                   marginRight: 20,
                   fontWeight: "bold",
                 }}
@@ -264,7 +312,7 @@ function FinalOrderReceipt({ data }: { data: FormData }) {
                   marginRight: 20,
                 }}
               >
-                Signature
+                Prepared By
               </Text>
             </View>
           </View>
@@ -275,23 +323,3 @@ function FinalOrderReceipt({ data }: { data: FormData }) {
 }
 
 export default FinalOrderReceipt;
-
-{
-  /* <View style={}>
-                  <Text style={}>QTY.</Text>
-                </View>
-                <View style={}>
-                  <Text style={}>UNIT</Text>
-                </View>
-              
-                <View style={}>
-                  <Text style={}>PRICE</Text>
-                </View>
-                <View style={}>
-                  <Text style={}>AMOUNT</Text>
-                </View>
-              </View> */
-}
-{
-  /* <Rows amount={data.amount[0]} /> */
-}

@@ -1,6 +1,7 @@
 "use client";
 import LayoutReceiptPDF from "@/components/ui/LayoutReceipt";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 /* eslint-disable react/no-deprecated */
 import ReactPDF, {
@@ -14,37 +15,75 @@ import ReactPDF, {
 import { ArrowRightToLineIcon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 const PDFPage = () => {
-  const searchParams = useSearchParams();
-  const name = searchParams.get("name");
-  const admin = searchParams.get("admin");
-  const amount = searchParams.get("amount") ?? "";
-  const artist = searchParams.get("artist");
-  const jobOrder = searchParams.get("jobOrder");
-  const page = searchParams.get("page");
-  const data = {
-    name: name,
-    admin: admin,
-    amount: amount,
-    artist: artist,
-    jobOrder: jobOrder,
-    page: page,
+    const params = useSearchParams();
+    const data = {
+      jobOrder: params.get("jobOrder"),
+      name: params.get("name"),
+      phone: params.get("phone"),
+      address: params.get("address"),
+      page: params.get("page"),
+      admin: params.get("admin"),
+      products: params.get("products"),
+      total: params.get("total"),
+      date: params.get("date"),
+      signature:params.get("signature")
+    };
+
+    
+
+  const [imageUrl, setImageUrl] = useState<string | ArrayBuffer | null>(null);
+
+  const handleImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    const file = event.target.files && event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
+
   return (
     <>
-      <PDFViewer style={styles.page}>
-        <LayoutReceiptPDF data={data} />
-      </PDFViewer>
-      <View
+      {imageUrl ? (
+        <PDFViewer style={styles.page}>
+            {/* @ts-ignore */}
+          <LayoutReceiptPDF data={data} imageUrl={imageUrl} />
+        </PDFViewer>
+      ) : (
+        <PDFViewer style={styles.page}>
+            {/* @ts-ignore */}
+          <LayoutReceiptPDF data={data} />
+        </PDFViewer>
+      )}
+
+<View
         style={{
           display: "flex",
+          marginTop:   ".3%" ,
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 50,
           position: "absolute",
-          top: ".8%",
-          left: "80%",
+          top:  0,
+          right: "10%",
         }}
       >
-        <Button variant={"outline"} asChild>
+        <div className="flex items-center justify-center rounded-lg  shadow-sm  min-h-max">
+          <div className="flex flex-col items-center gap-1 text-center">
+    
+            <Button asChild variant={"secondary"}>
+              <Input id="picture" type="file" onChange={handleImageChange} />
+            </Button>
+          </div>
+        </div>
+        <Button variant={"outline"} className="self-end" asChild>
           <Link href={"/dashboard"}>
             Done Printing <ArrowRightToLineIcon className="ms-2" />
           </Link>

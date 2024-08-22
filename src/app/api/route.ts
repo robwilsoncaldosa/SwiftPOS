@@ -64,16 +64,19 @@ export async function GET() {
   const sheets = await createSheetsClient();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: process.env.GOOGLE_SHEET_ID,
-    range: "LayoutForm!A2:F",
+    range: "LayoutForm!A2:I",
   });
 
   const data = response.data.values?.map((row) => ({
     jobOrder: row[0],
     name: row[1],
-    amount: row[2],
-    page: row[3],
-    admin: row[4],
-    artist: row[5],
+    phone: row[2],
+    address: row[3],
+    page: row[4],
+    admin: row[5],
+    products:row[6],
+    total:row[7],
+    date:row[8]
   }));
 
   return new Response(JSON.stringify(data), {
@@ -121,20 +124,4 @@ export async function POST(req: NextRequest) {
   );
 }
 
-export const handleLogin = async (username: string, password: string) => {
-  const username1 = "ADMIN1";
-  const password1 = "PASSWORD1";
-  const username2 = "ADMIN2";
-  const password2 = "PASSWORD2";
-  const username3 = "ADMIN3";
-  const password3 = "PASSWORD3";
 
-  const usernames = username1 || username2 || username3;
-  const passwords = password1 || password2 || password3;
-
-  if (username === usernames && password === passwords) {
-    cookies().set("currentUser", username);
-  } else {
-    return alert("Invalid Username or Password");
-  }
-};

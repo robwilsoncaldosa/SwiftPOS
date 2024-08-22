@@ -1,27 +1,28 @@
 "use client";
-import SpreadsheetIcon from "@/components/ui/SpreadsheetIcon";
 import { Button } from "@/components/ui/button";
-import { NextPage } from "next";
-import { useEffect, useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { Toaster } from "@/components/ui/toaster";
-import { FaCheck } from "react-icons/fa";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import LayoutOrder from "@/components/ui/LayoutOrderTable";
-import { revalidatePath } from "next/cache";
+import SpreadsheetIcon from "@/components/ui/SpreadsheetIcon";
+import { useToast } from "@/components/ui/use-toast";
+import { Check } from "lucide-react";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+
 export interface FormData {
   name: string;
-  amount: string;
+  phone: string;
+  address: string;
+  products: string;
+  total: string;
+  date: string;
   page: string;
   admin: string;
-  artist: string;
   jobOrder?: string;
 }
 const SuccessToast = () => (
   <div className="flex items-center justify-between">
     <p className="text-sm flex gap-2">
-      <FaCheck className="text-white" /> Your message has been sent
+      <Check className="text-white" /> Your message has been sent
       successfully!
     </p>
   </div>
@@ -31,20 +32,11 @@ export const HomePage = () => {
   const { toast } = useToast();
 
   const checkFormData = (formData: FormData) => {
-    if (formData.name === "") {
-      return false;
-    }
-    if (formData.amount === "") {
-      return false;
-    }
-    if (formData.admin === "") {
-      return false;
-    }
-    if (formData.artist === "") {
-      return false;
-    }
-    if (formData.page === "") {
-      return false;
+    const values = Object.values(formData);
+    for (const value of values) {
+      if (value === "") {
+        return false;
+      }
     }
     return true;
   };
@@ -57,14 +49,17 @@ export const HomePage = () => {
     setIsSubmitting(true);
     const data: FormData = {
       name: formData.name,
-      amount: formData.amount,
+      phone: formData.phone,
       admin: formData.admin,
-      artist: formData.artist,
+      address: formData.address,
       page: formData.page,
+      products: formData.products,
+      total: formData.total,
+      date: formData.date,
     };
 
     try {
-      const response = await fetch("/api", {
+      const response = await fetch("/dashboard/api", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -74,20 +69,25 @@ export const HomePage = () => {
       });
       setIsSubmitting(false);
       setIsSuccess(!!response.ok);
-
       response.ok && handleReset();
     } catch (error) {
       console.error(error);
     }
+    redirect("/dashboard");
+
+
   };
 
   const [textareaValue, setTextareaValue] = useState<string>("");
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    amount: "",
+    address: "",
     admin: "",
-    artist: "",
+    date: "",
     page: "",
+    phone: "",
+    products: "",
+    total: "",
   });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
@@ -96,10 +96,13 @@ export const HomePage = () => {
     setTextareaValue("");
     setFormData({
       name: "",
-      amount: "",
+      address: "",
       admin: "",
-      artist: "",
+      date: "",
       page: "",
+      phone: "",
+      products: "",
+      total: "",
     });
   };
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -118,8 +121,8 @@ export const HomePage = () => {
           parsedData.name = val;
 
           break;
-        case "amount":
-          parsedData.amount = val;
+        case "address":
+          parsedData.address = val;
 
           break;
         case "page":
@@ -130,8 +133,20 @@ export const HomePage = () => {
           parsedData.admin = val;
 
           break;
-        case "assigned artist":
-          parsedData.artist = val;
+        case "products":
+          parsedData.products = val;
+
+          break;
+        case "total":
+          parsedData.total = val;
+
+          break;
+        case "date":
+          parsedData.date = val;
+
+          break;
+        case "phone":
+          parsedData.phone = val;
 
           break;
         default:
@@ -146,6 +161,7 @@ export const HomePage = () => {
   };
 
   useEffect(() => {
+
     if (isSuccess) {
       toast({
         description: <SuccessToast />,
@@ -153,8 +169,8 @@ export const HomePage = () => {
       }),
         setTimeout(() => {
           setIsSuccess(false);
-          revalidatePath("/dashboard");
-        }, 3000);
+        }, 4000);
+      redirect("/dashboard");
     }
   }, [isSuccess, toast]);
 
@@ -191,12 +207,7 @@ export const HomePage = () => {
                 onChange={handleTextareaChange}
                 required
               ></textarea>
-              {/* <div>
-                <p>Name: {formData.name}</p>
-                <p>Email: {formData.email}</p>
-                <p>Phone: {formData.phone}</p>
-                <p>Message: {formData.message}</p>
-              </div> */}
+     
               <div className="flex gap-2 justify-center mt-2">
                 <Button onClick={handleSubmit} variant={"default"}>
                   Submit
@@ -209,7 +220,6 @@ export const HomePage = () => {
           </div>
         </Card>
       </main>
-      <Toaster />
     </>
   );
 };

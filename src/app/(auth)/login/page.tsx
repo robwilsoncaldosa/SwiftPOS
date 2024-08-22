@@ -4,17 +4,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { handleLogin } from "@/app/api/route";
+import { login } from "@/app/lib";
+import { redirect } from "next/navigation";
 export async function Login() {
-  const handleAuth = async (formData: FormData) => {
-    "use server";
-    const username = formData.get("username")?.toString();
-    const password = formData.get("password")?.toString();
-    if (!username || !password) {
-      return;
-    }
-    return await handleLogin(username, password);
-  };
+
   return (
     <div className="w-full  lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[951px]">
       <div className="flex items-center justify-center py-12">
@@ -25,20 +18,24 @@ export async function Login() {
               Enter your username below to login to your account
             </p>
           </div>
-          <form action={handleAuth}>
+          <form action={async(formData)=>{
+            'use server'
+            await login(formData)
+            redirect("/dashboard");
+          }}>
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="username">Username</Label>
-                <Input id="username" type="text" required />
+                <Input id="username" name="username" type="text" required />
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" type="password" required />
               </div>
-              <Button type="submit" className="w-full" asChild>
-                <Link href={"/"}>Login</Link>
+              <Button type="submit" className="w-full" >
+                Login
               </Button>
             </div>
           </form>
