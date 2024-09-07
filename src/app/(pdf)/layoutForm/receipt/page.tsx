@@ -15,7 +15,7 @@ import ReactPDF, {
 import { ArrowRightToLineIcon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 const PDFPage = () => {
     const params = useSearchParams();
@@ -32,7 +32,7 @@ const PDFPage = () => {
       signature:params.get("signature")
     };
 
-    
+    console.log(data.total)
 
   const [imageUrl, setImageUrl] = useState<string | ArrayBuffer | null>(null);
 
@@ -50,7 +50,7 @@ const PDFPage = () => {
   };
 
   return (
-    <>
+    <Suspense>
       {imageUrl ? (
         <PDFViewer style={styles.page}>
             {/* @ts-ignore */}
@@ -89,7 +89,7 @@ const PDFPage = () => {
           </Link>
         </Button>
       </View>
-    </>
+    </Suspense>
   );
 };
 

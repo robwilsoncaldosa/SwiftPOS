@@ -8,7 +8,7 @@ const Excalidraw = dynamic(
     },
 )
 
-import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types/types";
+import { ExcalidrawImperativeAPI, } from "@excalidraw/excalidraw/types/types";
 import { ChevronLeftCircle, Printer } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -36,14 +36,15 @@ const ExcalidrawWrapper: React.FC = () => {
     return (
         <>
       <Button size={"sm"}
-        className="bg-[#ececf4] text-[#1b1b1f] text-[12px] hover:bg-[#f1f0ff] "
+    //   className="bg-[#ececf4] dark:bg-[#232329] dark:text-[#E3E3E8] text-[#1b1b1f] text-[12px] hover:bg-[#f1f0ff] "
+        className="bg-[#ececf4]   text-[#1b1b1f] text-[12px] hover:bg-[#f1f0ff] "
         asChild>
-        <Link href={'/dashboard'} className="bg-[#ececf4] !text-[#1b1b1f] !text-[12px] hover:!bg-[#f1f0ff] !underline-none hover:!underline-none"   > 
+        <Link href={'/dashboard'} className="!no-underline !text-[#1b1b1f] "   > 
         <ChevronLeftCircle className="h-4 w-4 mr-2" />
         Go Back</Link></Button>  
       <Button
         size={"sm"}
-        className="bg-[#ececf4] text-[#1b1b1f] text-[12px] hover:bg-[#f1f0ff] "
+        className="bg-[#ececf4]   text-[#1b1b1f] text-[12px] hover:bg-[#f1f0ff] "
         onClick={() => {
             window.print();
         }}

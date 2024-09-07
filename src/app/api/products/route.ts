@@ -1,7 +1,6 @@
 import { google } from "googleapis";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
-import { FormData } from "../../HomePage";
 import { cookies } from "next/headers";
 
 const createSheetsClient = async () => {
@@ -64,19 +63,16 @@ export async function GET() {
     const sheets = await createSheetsClient();
     const response = await sheets.spreadsheets.values.get({
         spreadsheetId: process.env.GOOGLE_SHEET_ID,
-        range: "LayoutForm!A2:F",
+        range: "Products!A2:F",
     });
 
     const data = response.data.values?.map((row) => ({
         jobOrder: row[0],
-        name: row[1],
-        phone: row[2],
-        address: row[3],
-        page: row[4],
-        admin: row[5],
-        products: row[6],
-        total: row[7],
-        date: row[8],
+        product: row[1],
+        size: row[2],
+        quantity: row[3],
+        price: row[4],
+        total: row[5],
     }));
 
     return new Response(JSON.stringify(data || []), {

@@ -234,15 +234,14 @@ function LayoutReceiptPDF({
                     width:120,
                     position: "absolute",
                     backgroundColor: "transparent",
-                    top:-13,
+                    top:-20,
                     right: 0,
                   }}
                 />
                 <Text
                   style={{
                     fontSize: 10,
-                    marginTop: 5,
-                    marginRight: 28,
+                    marginRight: 20,
                     fontWeight: "bold",
                   }}
                 >

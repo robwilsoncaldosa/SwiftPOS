@@ -128,7 +128,7 @@ export const LayoutOrderTable = async () => {
         </Table>
       </Card>
       </TabsContent>
-      <TabsContent value="order">
+      {/* <TabsContent value="order">
       <Card className="text-card-foreground p-6 space-y-2">
         <CardTitle>Final Order</CardTitle>
         <CardDescription>
@@ -207,17 +207,10 @@ export const LayoutOrderTable = async () => {
               </TableRow>
             ))}
           </TableBody>
-          {/* <TableFooter>
-        <TableRow>
-          <TableCell></TableCell>
-          <TableCell></TableCell>
-          <TableCell colSpan={3}>Total:{totalAmount}</TableCell>
-          <TableCell></TableCell>
-        </TableRow>
-      </TableFooter> */}
+        
         </Table>
       </Card>
-      </TabsContent>
+      </TabsContent> */}
     </Tabs>
   );
 };

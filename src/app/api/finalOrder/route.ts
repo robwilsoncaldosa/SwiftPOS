@@ -1,8 +1,5 @@
 import { google } from "googleapis";
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextRequest, NextResponse } from "next/server";
-import { FormData } from "../../HomePage";
-import { cookies } from "next/headers";
+import { NextRequest } from "next/server";
 
 const createSheetsClient = async () => {
   try {
@@ -61,29 +58,63 @@ async function getNextJobOrder(
 }
 
 export async function GET() {
-    const sheets = await createSheetsClient();
-    const response = await sheets.spreadsheets.values.get({
-        spreadsheetId: process.env.GOOGLE_SHEET_ID,
-        range: "LayoutForm!A2:F",
-    });
+  const sheets = await createSheetsClient();
 
-    const data = response.data.values?.map((row) => ({
-        jobOrder: row[0],
-        name: row[1],
-        phone: row[2],
-        address: row[3],
-        page: row[4],
-        admin: row[5],
-        products: row[6],
-        total: row[7],
-        date: row[8],
-    }));
+  // Get the data from the "Final-Order" sheet
+  const finalOrderResponse = await sheets.spreadsheets.values.get({
+    spreadsheetId: process.env.GOOGLE_SHEET_ID,
+    range: "Final-Order!A2:M",
+  });
 
-    return new Response(JSON.stringify(data || []), {
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
+  const finalOrderData =
+    finalOrderResponse.data.values?.map((row) => ({
+      jobOrder: row[0],
+      name: row[1],
+      phone: row[2],
+      address: row[3],
+      subtotal: row[4],
+      "shipping-fee": row[5],
+      "package-box": row[6],
+      "total-cost": row[7],
+      "down-payment": row[8],
+      "layout-fee": row[9],
+      "remaining-balance": row[10],
+      admin: row[11],
+      date: row[12],
+    })) || [];
+
+  // Get the data from the "Products" sheet
+  const productsResponse = await sheets.spreadsheets.values.get({
+    spreadsheetId: process.env.GOOGLE_SHEET_ID,
+    range: "Products!A2:F",
+  });
+
+  const productsData =
+    productsResponse.data.values?.map((row) => ({
+      jobOrder: row[0],
+      product: row[1],
+      size: row[2],
+      quantity: row[3],
+      price: row[4],
+      total: row[5],
+    })) || [];
+
+  // Combine the final order data with the products data
+  const combinedData = finalOrderData.map((order) => {
+    const products = productsData.filter(
+      (product) => product.jobOrder === order.jobOrder
+    );
+    return {
+      ...order,
+      products,
+    };
+  });
+
+  return new Response(JSON.stringify(combinedData), {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -110,7 +141,7 @@ export async function POST(req: NextRequest) {
           body.admin,
           body.products,
           body.total,
-          body.date
+          body.date,
         ],
       ],
     },

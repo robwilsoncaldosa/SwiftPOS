@@ -15,7 +15,7 @@ const PDFPage = () => {
     const searchParams = useSearchParams();
     const keys = Array.from(searchParams.keys());
     const data: Record<string, string | null> = {};
-    
+        
     keys.forEach((key) => {
       data[key] = searchParams.get(key);
     });

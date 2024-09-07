@@ -1,13 +1,11 @@
 import Image from "next/image";
-import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { login } from "@/app/lib";
 import { redirect } from "next/navigation";
-export async function Login() {
-
+function Login() {
   return (
     <div className="w-full  lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[951px]">
       <div className="flex items-center justify-center py-12">
@@ -18,11 +16,13 @@ export async function Login() {
               Enter your username below to login to your account
             </p>
           </div>
-          <form action={async(formData)=>{
-            'use server'
-            await login(formData)
-            redirect("/dashboard");
-          }}>
+          <form
+            action={async (formData: FormData) => {
+              "use server";
+              await login(formData);
+              redirect("/dashboard");
+            }}
+          >
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="username">Username</Label>
@@ -34,7 +34,7 @@ export async function Login() {
                 </div>
                 <Input id="password" name="password" type="password" required />
               </div>
-              <Button type="submit" className="w-full" >
+              <Button type="submit" className="w-full">
                 Login
               </Button>
             </div>

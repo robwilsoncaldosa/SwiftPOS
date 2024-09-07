@@ -1,3 +1,4 @@
+'use client'
 import dynamic from "next/dynamic";
 
 // Since client components get prerenderd on server as well hence importing 

@@ -1,6 +1,8 @@
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "next-themes";
+import { ModeToggle } from "@/components/theme-toggler";
 
 // const UserProvider = dynamic(
 //   async () => (await import("@/components/UserProvider")).UserProvider,
@@ -18,12 +20,23 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) { 
-
+}>) {
   return (
-    <html lang="en" suppressHydrationWarning={true} className={GeistSans.className}>
-      <body className='antialiased'>
+    <html
+      lang="en"
+      suppressHydrationWarning={true}
+      className={GeistSans.className}
+    >
+      <body className="antialiased bg-muted/50">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           {children}
+        </ThemeProvider>
+
       </body>
     </html>
   );

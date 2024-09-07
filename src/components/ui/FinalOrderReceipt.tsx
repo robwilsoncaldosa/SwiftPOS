@@ -108,6 +108,7 @@ interface FinalOrderData extends FormData {
     "remaining-balance":string
     "jobOrder":string
     "date":string
+    'signature':string
 }
 
 function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
@@ -133,7 +134,9 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
   return (
     <Document style={{ width: "100%", height: "100%" }} title="Final Receipt">
       <Page size={"LEGAL"} style={styles.page}>
-        {Array.from({ length: 1 }).map((_, ic) => (
+        {Array.from({ length: 
+            5
+         }).map((_, ic) => (
           <View key={ic} style={styles.section} wrap>
             <View style={styles.mainHeader}>
               <Text
@@ -201,7 +204,7 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
                       {item.size}
                     </Text>
                     <Text style={{ color: "#09090b", marginRight:70,marginLeft:25 }}>
-                      ₱{item.price}
+                      {item.price}
                     </Text>
                     <Text
                       style={{
@@ -219,7 +222,7 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
                         marginRight: 20,
                       }}
                     >
-                      ₱{item.total}
+                      {item.total}
                     </Text>
                   </View>
               </View>
@@ -228,28 +231,28 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
               <View style={styles.separator}></View>
               <View style={styles.items}>
                 <Text style={{ marginRight: "auto" }}>SubTotal</Text>
-                <Text style={styles.value}>₱{data.subtotal}</Text>
+                <Text style={styles.value}>{data.subtotal}</Text>
               </View>
               <View style={styles.items}>
                 <Text style={{ marginRight: "auto" }}>Shipping</Text>
-                <Text style={styles.value}>₱{data['shipping-fee']}</Text>
+                <Text style={styles.value}>{data['shipping-fee']}</Text>
               </View>
               <View style={styles.items}>
                 <Text style={{ marginRight: "auto" }}>
                   Package Box - Medium
                 </Text>
-                <Text style={styles.value}>₱{data['package-box']}</Text>
+                <Text style={styles.value}>{data['package-box']}</Text>
               </View>
               <View style={styles.items}>
                 <Text style={{ marginRight: "auto" }}>Total</Text>
-                <Text style={styles.value}>₱{data['total-cost']}</Text>
+                <Text style={styles.value}>{data['total-cost']}</Text>
               </View>
               <View style={styles.items}>
                 <Text>Downpayment</Text>
                 <Text
                   style={[styles.value, { color: "red", fontWeight: "medium" }]}
                 >
-                  - ₱{data['down-payment']}
+                  - {data['down-payment']}
                 </Text>
               </View>
               {data['layout-fee'] === '0' ? null : (
@@ -259,7 +262,7 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
               <Text
                 style={[styles.value, { color: "red", fontWeight: "medium" }]}
               >
-                - ₱{data['layout-fee']}
+                - {data['layout-fee']}
               </Text>
             </View>
               )}
@@ -267,7 +270,7 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
               <View style={styles.total}>
                 <Text>Remaining Balance</Text>
                 <Text style={[styles.value, { fontSize: 10, color: "black" }]}>
-                ₱{data['remaining-balance']}
+                {data['remaining-balance']}
                 </Text>
               </View>
               <View style={styles.separator}></View>
@@ -283,15 +286,14 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
               }}
             >
               <Image
-                src={"/signature.png"}
+                src={data.signature}
                 style={{
-                  width: 50,
-                  position: "absolute",
-                  backgroundColor: "transparent",
-                  bottom: 8,
-                  right: 8,
-                  marginRight: 20,
-                }}
+                    width:120,
+                    position: "absolute",
+                    backgroundColor: "transparent",
+                    top:-18,
+                    right: 0,
+                  }}
               />
               <Text
                 style={{
@@ -300,7 +302,7 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
                   fontWeight: "bold",
                 }}
               >
-                Jannah Aleriosa
+               {data.admin}
               </Text>
               <Text
                 style={{

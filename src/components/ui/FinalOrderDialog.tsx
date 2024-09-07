@@ -4,7 +4,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from './button'
 import Link from 'next/link'
 import FinalOrderForm from './FinalOrderForm'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { ListOrdered, Truck } from 'lucide-react'
 type User = {
     name: string;
     signature: string;
@@ -20,7 +21,8 @@ export interface DataProps{
         admin: string|undefined;
         products: string|undefined;
         total: string|undefined;
-        date: string|undefined;    
+        date: string|undefined;  
+        signature: string|undefined;  
     }
        signature: string | undefined;
     }
@@ -30,18 +32,23 @@ const FinalOrderDialog = ({data,signature}:DataProps) => {
 
     const [open,setOpen] = useState(false)
     const router = useRouter()
-  
 
     useEffect(() => {
+
         if(!open){
+            const currentJobOrder = localStorage.getItem('jobOrder')
+            localStorage.setItem('currentjobOrder',currentJobOrder ?? '')
             router.replace('/dashboard')
+    
         }
-    }, [open,router])
+        
+        
+    }, [open, router, data.jobOrder])
    
   return (
     <Dialog open={open} onOpenChange={()=>setOpen(!open)}>
     <DialogTrigger asChild>
-      <Button   variant={"default"} asChild>
+      <Button   variant={"secondary"} asChild>
         <Link
           href={{
             pathname: "/dashboard",
@@ -55,11 +62,11 @@ const FinalOrderDialog = ({data,signature}:DataProps) => {
                 products: data.products,
                 total: data.total,
                 date: data.date,
-                signate:signature
+                signature:data.signature,
             },
           }}
         >
-          Final Order
+        <Truck className='w-4 mr-2'/>  Final Order
         </Link>
       </Button>
     </DialogTrigger>

@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import SpreadsheetIcon from "@/components/ui/SpreadsheetIcon";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Check } from "lucide-react";
-import { redirect } from "next/navigation";
+import { Check, Eraser, Send } from "lucide-react";
+import { revalidatePath } from "next/cache";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export interface FormData {
@@ -14,23 +16,23 @@ export interface FormData {
   address: string;
   products: string;
   total: string;
-  date: string;
+  date?: string;
   page: string;
-  admin: string;
+  admin?: string;
   jobOrder?: string;
+  signature?: string;
 }
 const SuccessToast = () => (
   <div className="flex items-center justify-between">
     <p className="text-sm flex gap-2">
-      <Check className="text-white" /> Your message has been sent
-      successfully!
+      <Check className="text-white" /> Your message has been sent successfully!
     </p>
   </div>
 );
 
-export const HomePage = () => {
+export const HomePage = ({ Admin }: { Admin: string }) => {
   const { toast } = useToast();
-
+  const router = useRouter();
   const checkFormData = (formData: FormData) => {
     const values = Object.values(formData);
     for (const value of values) {
@@ -50,7 +52,7 @@ export const HomePage = () => {
     const data: FormData = {
       name: formData.name,
       phone: formData.phone,
-      admin: formData.admin,
+      admin: Admin,
       address: formData.address,
       page: formData.page,
       products: formData.products,
@@ -73,16 +75,12 @@ export const HomePage = () => {
     } catch (error) {
       console.error(error);
     }
-    redirect("/dashboard");
-
-
   };
 
   const [textareaValue, setTextareaValue] = useState<string>("");
   const [formData, setFormData] = useState<FormData>({
     name: "",
     address: "",
-    admin: "",
     date: "",
     page: "",
     phone: "",
@@ -111,7 +109,7 @@ export const HomePage = () => {
 
     const parsedData: Partial<FormData> = {};
     const regex =
-      /(Name of client|Amount|Assigned admin|Assigned artist|Page)\s*:\s*([^\n]+)/gi;
+      /(Name of client|Total|Page|Phone|Date|Products|Address)\s*:\s*([^\n]+)/gi;
     let match;
     while ((match = regex.exec(value)) !== null) {
       const key = match[1].toLowerCase();
@@ -127,11 +125,6 @@ export const HomePage = () => {
           break;
         case "page":
           parsedData.page = val;
-
-          break;
-        case "assigned admin":
-          parsedData.admin = val;
-
           break;
         case "products":
           parsedData.products = val;
@@ -161,18 +154,18 @@ export const HomePage = () => {
   };
 
   useEffect(() => {
-
     if (isSuccess) {
+      router.refresh();
+
       toast({
         description: <SuccessToast />,
-        className: "bg-green-500 text-white",
+        className: "bg-green-500 text-white transition",
       }),
         setTimeout(() => {
           setIsSuccess(false);
-        }, 4000);
-      redirect("/dashboard");
+        }, 500);
     }
-  }, [isSuccess, toast]);
+  }, [isSuccess, router, toast]);
 
   return isSubmitting ? (
     <div className="flex max-w-md flex-col gap-4 items-center justify-center m-auto">
@@ -187,33 +180,28 @@ export const HomePage = () => {
     </div>
   ) : (
     <>
-      <main className=" flex items-center w-full    bg-muted/40">
-        <Card className="w-full max-w-md mx-auto shadow-none p-8 border-0  ">
+      <main className=" flex items-center w-full ">
+        <Card className="w-full max-w-md mx-auto shadow-none p-8 border-0  bg-background">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center dark:text-foreground">
             Paste and send to <SpreadsheetIcon />
           </h2>
           <div>
-            <Label
-              htmlFor="data"
-              className="block text-md font-medium text-foreground"
-            >
-              Data
-            </Label>
             <div>
-              <textarea
+              <Textarea
                 name="data"
-                className="text-black mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm min-h-52 dark:text-foreground"
+                className="text-foreground h-60"
+                placeholder={`Example Format Below:\n\nName of client: Juan Dela Cruz\nTotal: ₱1,000\nPage: VSY\nPhone: 0912345678\nDate: August 22, 2024\nProducts: T-Shirt, Polo-Shirt, Jacket\nAddress: Lapu-lapu City, Cebu, Philippines`}
                 value={textareaValue}
                 onChange={handleTextareaChange}
                 required
-              ></textarea>
-     
-              <div className="flex gap-2 justify-center mt-2">
-                <Button onClick={handleSubmit} variant={"default"}>
-                  Submit
+              />
+
+              <div className="flex gap-2 justify-center mt-8">
+                <Button onClick={handleSubmit} variant={"secondary"}>
+                  <Send className="w-4 mr-2" /> Submit
                 </Button>
                 <Button onClick={handleReset} variant={"destructive"}>
-                  Reset
+                  <Eraser className="w-4 mr-2" /> Reset
                 </Button>
               </div>
             </div>

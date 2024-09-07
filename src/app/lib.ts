@@ -21,8 +21,7 @@ export async function login(formData: FormData) {
 
   if (!isValid) {
     // If credentials are invalid, redirect to login page
-    throw new Error("Invalid credentials");
-  }
+throw new Error("Invalid username or password. Please refresh to restart");}
 
   // Create a session string (no encryption)
 

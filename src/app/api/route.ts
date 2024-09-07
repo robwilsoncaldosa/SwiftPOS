@@ -59,60 +59,124 @@ async function getNextJobOrder(
     throw new Error("Could not retrieve the next job order.");
   }
 }
-
 export async function GET() {
-  const sheets = await createSheetsClient();
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: process.env.GOOGLE_SHEET_ID,
-    range: "LayoutForm!A2:I",
-  });
+    try {
+        const sheets = await createSheetsClient();
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: process.env.GOOGLE_SHEET_ID,
+            range: "LayoutForm!A2:I",
+        });
 
-  const data = response.data.values?.map((row) => ({
-    jobOrder: row[0],
-    name: row[1],
-    phone: row[2],
-    address: row[3],
-    page: row[4],
-    admin: row[5],
-    products:row[6],
-    total:row[7],
-    date:row[8]
-  }));
+        const data = response.data.values?.map((row) => ({
+            jobOrder: row[0],
+            name: row[1],
+            phone: row[2],
+            address: row[3],
+            page: row[4],
+            admin: row[5],
+            products: row[6],
+            total: row[7],
+            date: row[8],
+        }));
 
-  return new Response(JSON.stringify(data), {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+        if (!data) {
+            return new Response(JSON.stringify([]), {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+        }
+
+        return new Response(JSON.stringify(data), {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        return new Response(JSON.stringify({ error: "Failed to fetch data" }), {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            status: 500,
+        });
+    }
 }
 
+
+
+
+
+//for finalOrder inserting Data GoogleSheet
+interface FinalOrderData extends FormData {
+  subtotal: string;
+  "shipping-fee": string;
+  "package-box": string;
+  "total-cost": string;
+  "down-payment": string;
+  "layout-fee": string;
+  "remaining-balance": string;
+  [key: `product${number}` | `size${number}` | `quantity${number}` | `price${number}` | `total${number}`]: string | number;
+}
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as FormData;
+  const body = (await req.json()) as FinalOrderData;
 
   const sheets = await createSheetsClient();
   const nextJobOrder = await getNextJobOrder(
     process.env.GOOGLE_SHEET_ID,
-    "LayoutForm!A:A"
+    "Final-Order!A:A"
   );
 
   const response = await sheets.spreadsheets.values.append({
     spreadsheetId: process.env.GOOGLE_SHEET_ID,
-    range: "LayoutForm!A1:F1",
+    range: "Final-Order!A1:M1",
     valueInputOption: "USER_ENTERED",
     requestBody: {
       values: [
         [
           nextJobOrder,
           body.name,
-          body.amount,
-          body.page,
+          body.phone,
+          body.address,
+          body.subtotal,
+          body["shipping-fee"],
+          body["package-box"],
+          body["total-cost"],
+          body["down-payment"],
+          body["layout-fee"],
+          body["remaining-balance"],
           body.admin,
-          body.artist,
+          body.date
         ],
       ],
     },
   });
 
+  const productEntries = [];
+  for (let i = 1; i <= Object.keys(body).length; i++) {
+      if (body[`product${i}`]) {
+          productEntries.push([
+              nextJobOrder,
+              body[`product${i}`],
+              body[`size${i}`],
+              body[`quantity${i}`],
+              body[`price${i}`],
+              body[`total${i}`]
+          ]);
+      }
+  }
+  
+  if (productEntries.length > 0) {
+      const insertProducts = await sheets.spreadsheets.values.append({
+          spreadsheetId: process.env.GOOGLE_SHEET_ID,
+          range: "Products!A1:F1",
+          valueInputOption: "USER_ENTERED",
+          requestBody: {
+              values: productEntries,
+          },
+      });
+  }
+  
   return new Response(
     JSON.stringify({ message: "Success", data: response.data }),
     {
@@ -123,5 +187,3 @@ export async function POST(req: NextRequest) {
     }
   );
 }
-
-
