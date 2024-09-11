@@ -63,7 +63,7 @@ export async function GET() {
   // Get the data from the "Final-Order" sheet
   const finalOrderResponse = await sheets.spreadsheets.values.get({
     spreadsheetId: process.env.GOOGLE_SHEET_ID,
-    range: "Final-Order!A2:M",
+    range: "Final-Order!A2:O",
   });
 
   const finalOrderData =
@@ -75,12 +75,14 @@ export async function GET() {
       subtotal: row[4],
       "shipping-fee": row[5],
       "package-box": row[6],
-      "total-cost": row[7],
-      "down-payment": row[8],
-      "layout-fee": row[9],
-      "remaining-balance": row[10],
-      admin: row[11],
-      date: row[12],
+      "tax":row[7],
+      "total-cost": row[8],
+      "down-payment": row[9],
+      "discount":row[10],
+      "layout-fee": row[11],
+      "remaining-balance": row[12],
+      admin: row[13],
+      date: row[14],
     })) || [];
 
   // Get the data from the "Products" sheet

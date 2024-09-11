@@ -12,6 +12,7 @@ import ReactPDF, {
   Font,
 } from "@react-pdf/renderer";
 import { useSearchParams } from "next/navigation";
+import { Fragment } from "react";
 
 Font.register({
   family: "Inter",
@@ -50,35 +51,38 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 14,
-    fontWeight: "semibold",
-    margin: 2,
+    fontWeight: "bold",
   },
   mainHeader: {
     display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
-    flexDirection: "column",
     backgroundColor: "#F4F4F580",
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   Container: {
     display: "flex",
-    padding: 16,
+    paddingHorizontal: 4,
     flexDirection: "column",
     backgroundColor: "white",
-    gap: 7,
+    gap: 4,
   },
   Header: {
+    display: "flex",
     fontSize: 10,
     fontWeight: "medium",
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 4,
   },
   items: {
     color: "#71717a",
     fontWeight: 100,
-    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingVertical: 1,
   },
   total: {
     fontFamily: "Inter",
@@ -88,27 +92,28 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   value: {
-    marginLeft: "auto",
     color: "#09090b",
   },
   separator: {
     height: 0.7,
+    marginVertical: 1,
     backgroundColor: "#e4e4e7",
-    marginVertical: 10,
   },
 });
 
 interface FinalOrderData extends FormData {
-    "subtotal":string
-    "shipping-fee":string
-    "package-box":string
-    "total-cost":string
-    "down-payment":string
-    "layout-fee":string
-    "remaining-balance":string
-    "jobOrder":string
-    "date":string
-    'signature':string
+  subtotal: string;
+  "shipping-fee": string;
+  "package-box": string;
+  tax: string;
+  "total-cost": string;
+  "down-payment": string;
+  "layout-fee": string;
+  discount: string;
+  "remaining-balance": string;
+  jobOrder: string;
+  date: string;
+  signature: string;
 }
 
 function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
@@ -116,27 +121,35 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
   const products = Object.keys(data)
     .filter((key) => key.startsWith("product") && !key.startsWith("products"))
     .map((key) => {
-      const index = key.replace("product", "");
+      const index = key.replace("product", ""); // Get the product index (e.g., '1', '2')
+
       return {
         //@ts-ignore
         product: data[`product${index}`],
+        // Parse sizes and quantities into arrays by splitting on commas
         //@ts-ignore
-        size: data[`size${index}`],
+
+        size: data[`size${index}`] ? data[`size${index}`].split(",") : [],
         //@ts-ignore
+
+        quantity: data[`quantity${index}`]
+          ? data[`quantity${index}`].split(",")
+          : [],
+        //@ts-ignore
+
         price: data[`price${index}`],
         //@ts-ignore
-        quantity: data[`quantity${index}`],
-        //@ts-ignore
+
         total: data[`total${index}`],
       };
     });
+
   console.log(products);
+
   return (
     <Document style={{ width: "100%", height: "100%" }} title="Final Receipt">
-      <Page size={"LEGAL"} style={styles.page}>
-        {Array.from({ length: 
-            5
-         }).map((_, ic) => (
+      <Page size={"LETTER"} style={styles.page}>
+        {Array.from({ length: 4 }).map((_, ic) => (
           <View key={ic} style={styles.section} wrap>
             <View style={styles.mainHeader}>
               <Text
@@ -147,24 +160,16 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
                   },
                 ]}
               >
-                Order&nbsp;
-                <Text
-                  style={{
-                    fontFamily: "Inter",
-                    fontWeight: "bold",
-                    letterSpacing: "-.8px",
-                  }}
-                >
-                  {data.jobOrder}
-                </Text>
+                Job Order:&nbsp;{" "}
+                <Text style={{ fontWeight: "semibold" }}>{data.jobOrder}</Text>
               </Text>
+
               <Text
                 style={[
                   styles.header,
                   { fontSize: 10, color: "#71717a", fontWeight: "light" },
                 ]}
               >
-                Date:
                 <Text
                   style={{
                     fontSize: 10,
@@ -178,99 +183,172 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
             </View>
 
             <View style={styles.Container}>
-              <View style={styles.Header}>
-                <Text>Products</Text>
-                <Text>Sizes</Text>
-                <Text>Price</Text>
-                <Text>Quantity</Text>
-                <Text>Total</Text>
-              </View>
               {products.map((item, index) => (
-
-              <View key={index} style={styles.items}>
-                  <View
-                    key={index}
-                    style={{ flexDirection: "row", alignItems: "center" }}
-                  >
-                    <Text style={{ flexBasis: 60, marginRight: 50 }}>
-                      {item.product}
-                    </Text>
-                    <Text
-                      style={{
-                        color: "#09090b",
-                        flexBasis: 30,
-                      }}
-                    >
-                      {item.size}
-                    </Text>
-                    <Text style={{ color: "#09090b", marginRight:70,marginLeft:25 }}>
-                      {item.price}
-                    </Text>
-                    <Text
-                      style={{
-                        color: "#09090b",
-                        flexBasis: 20,
-                        marginRight: 20,
-                      }}
-                    >
-                      {item.quantity}
-                    </Text>
-                    <Text
-                      style={{
-                        color: "#09090b",
-                        flexBasis: 30,
-                        marginRight: 20,
-                      }}
-                    >
-                      {item.total}
+                <Fragment key={index}>
+                  <View style={{}}>
+                    <Text style={{ fontSize: 12, fontWeight: "semibold" }}>
+                      Product Name: {item.product}
                     </Text>
                   </View>
-              </View>
-                ))}
+                  <View style={styles.Header}>
+                    <View
+                      style={{
+                        flexDirection: "column",
+                        fontWeight: "medium",
+                        color: "#71717a",
+                      }}
+                    >
+                      <Text style={{ color: "black" }}>Sizes</Text>
+                      {/* @ts-ignore */}
+                      {item.size.map((s, i) => (
+                        <Text key={i}>{s}</Text>
+                      ))}
+                    </View>
+                    <View style={{ alignItems: "center" }}>
+                      <Text>Quantity</Text>
+                      {/* @ts-ignore */}
+                      {item.quantity.map((q, i) => (
+                        <Text
+                          style={{ color: "#71717a", textAlign: "center" }}
+                          key={i}
+                        >
+                          {q}
+                        </Text>
+                      ))}
+                    </View>
+                    <View>
+                      <Text>Price</Text>
+                      {/* @ts-ignore */}
+                      {item.size.map((size, index) => (
+                        <Text key={index}>{item.price}</Text>
+                      ))}
+                    </View>
+
+                    <View>
+                      <Text style={{ textAlign: "right" }}>Total</Text>
+                      {/* @ts-ignore */}
+                      {item.size.map((size, index) => {
+                        // Determine the additional cost based on the size
+                        let additionalCost = 0;
+                        if (["XL", "2XL", "3XL", "4XL", "5XL"].includes(size)) {
+                          additionalCost =
+                            (parseInt(size.replace("XL", "")) || 1) * 30; // Calculate the cost increment
+                        }
+
+                        // Calculate the total price including the additional cost
+                        const totalPrice =
+                          parseInt(item.price.replace("₱", "")) *
+                            parseInt(item.quantity) +
+                          additionalCost;
+
+                        return <Text key={index}>₱{totalPrice}</Text>;
+                      })}
+
+                      <Text>{item.total}</Text>
+                    </View>
+                  </View>
+                </Fragment>
+              ))}
 
               <View style={styles.separator}></View>
-              <View style={styles.items}>
-                <Text style={{ marginRight: "auto" }}>SubTotal</Text>
-                <Text style={styles.value}>{data.subtotal}</Text>
-              </View>
-              <View style={styles.items}>
-                <Text style={{ marginRight: "auto" }}>Shipping</Text>
-                <Text style={styles.value}>{data['shipping-fee']}</Text>
-              </View>
-              <View style={styles.items}>
-                <Text style={{ marginRight: "auto" }}>
-                  Package Box - Medium
-                </Text>
-                <Text style={styles.value}>{data['package-box']}</Text>
-              </View>
-              <View style={styles.items}>
-                <Text style={{ marginRight: "auto" }}>Total</Text>
-                <Text style={styles.value}>{data['total-cost']}</Text>
-              </View>
-              <View style={styles.items}>
-                <Text>Downpayment</Text>
-                <Text
-                  style={[styles.value, { color: "red", fontWeight: "medium" }]}
-                >
-                  - {data['down-payment']}
-                </Text>
-              </View>
-              {data['layout-fee'] === '0' ? null : (
-              <View style={styles.items}>
-                
-              <Text>Layout Fee - Paid</Text>
-              <Text
-                style={[styles.value, { color: "red", fontWeight: "medium" }]}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
               >
-                - {data['layout-fee']}
-              </Text>
-            </View>
-              )}
-              
+                <View style={styles.items}>
+                  <Text style={{}}>SubTotal</Text>
+                  <Text style={styles.value}>{data.subtotal || null}</Text>
+                </View>
+                <View style={styles.items}>
+                  <Text style={{}}>Shipping</Text>
+                  <Text style={styles.value}>
+                    {data["shipping-fee"] || null}
+                  </Text>
+                </View>
+                <View style={styles.items}>
+                  <Text style={{}}>Package Box</Text>
+                  <Text style={styles.value}>
+                    {data["package-box"] || null}
+                  </Text>
+                </View>
+                {data.tax && (
+                  <View style={styles.items}>
+                    <Text style={{}}>Tax</Text>
+                    <Text style={styles.value}>{data.tax || null}</Text>
+                  </View>
+                )}
+
+                <View style={styles.items}>
+                  <Text style={{}}>Total</Text>
+                  <Text style={[styles.value, {}]}>
+                    {data["total-cost"] || null}
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                {data["down-payment"] && (
+                  <View style={[styles.items, { flexDirection: "row" }]}>
+                    <Text>Downpayment: &nbsp;</Text>
+                    <Text
+                      style={[
+                        styles.value,
+                        { color: "red", fontWeight: "medium" },
+                      ]}
+                    >
+                      - {data["down-payment"] || null}
+                    </Text>
+                  </View>
+                )}
+
+                {data["layout-fee"] === "0" ? null : (
+                  <View style={[styles.items, { flexDirection: "row" }]}>
+                    <Text>Layout: &nbsp;</Text>
+                    <Text
+                      style={[
+                        styles.value,
+                        { color: "red", fontWeight: "medium" },
+                      ]}
+                    >
+                      - {data["layout-fee"] || null}
+                    </Text>
+                  </View>
+                )}
+                {data.discount && (
+                  <View style={[styles.items, { flexDirection: "row" }]}>
+                    <Text>Discount: &nbsp;</Text>
+                    <Text
+                      style={[
+                        styles.value,
+                        { color: "red", fontWeight: "medium" },
+                      ]}
+                    >
+                      - {data.discount}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
               <View style={styles.total}>
                 <Text>Remaining Balance</Text>
-                <Text style={[styles.value, { fontSize: 10, color: "black" }]}>
-                {data['remaining-balance']}
+                <Text
+                  style={[
+                    styles.value,
+                    {
+                      fontSize: 14,
+                      textDecoration: "underline",
+                      color: "black",
+                      marginLeft: "auto",
+                    },
+                  ]}
+                >
+                  {data["remaining-balance"] || null}
                 </Text>
               </View>
               <View style={styles.separator}></View>
@@ -282,27 +360,28 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
                 justifyContent: "center",
                 width: "100%",
                 alignItems: "flex-end",
-                marginBottom: 20,
+                marginTop: 17,
+                paddingHorizontal: 15,
+                position: "relative",
               }}
             >
               <Image
                 src={data.signature}
                 style={{
-                    width:120,
-                    position: "absolute",
-                    backgroundColor: "transparent",
-                    top:-18,
-                    right: 0,
-                  }}
+                  width: 120,
+                  position: "absolute",
+                  backgroundColor: "transparent",
+                  top: -18,
+                  left: "auto",
+                }}
               />
               <Text
                 style={{
                   fontSize: 10,
-                  marginRight: 20,
                   fontWeight: "bold",
                 }}
               >
-               {data.admin}
+                {data.admin}
               </Text>
               <Text
                 style={{
@@ -311,7 +390,6 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
                   width: 80,
                   textAlign: "center",
                   paddingTop: 1,
-                  marginRight: 20,
                 }}
               >
                 Prepared By

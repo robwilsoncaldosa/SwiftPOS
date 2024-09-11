@@ -11,9 +11,11 @@ interface OrderData extends FormData {
   subtotal: string;
   "shipping-fee": string;
   "package-box": string;
+  "tax":string;
   "total-cost": string;
   "down-payment": string;
   "layout-fee": string;
+  "discount":string;
   "remaining-balance": string;
 }
 
@@ -60,9 +62,13 @@ export const columns: ColumnDef<OrderData>[] = [
     header: "Shipping Fee",
   },
   {
-    accessorKey: "package-box",
-    header: "Package Box",
-  },
+      accessorKey: "package-box",
+      header: "Package Box",
+    },
+    {
+      accessorKey:'tax',
+      header:"Tax"
+    },
   {
     accessorKey: "total-cost",
     header: "Total Cost",
@@ -70,6 +76,10 @@ export const columns: ColumnDef<OrderData>[] = [
   {
     accessorKey: "down-payment",
     header: "Down Payment",
+  },
+  {
+    accessorKey:"discount",
+    header:"Discount"
   },
   {
     accessorKey: "remaining-balance",
@@ -121,9 +131,11 @@ export const columns: ColumnDef<OrderData>[] = [
           subtotal: finalOrder.subtotal,
           "shipping-fee": finalOrder["shipping-fee"],
           "package-box": finalOrder["package-box"],
+          "tax":finalOrder.tax,
           "total-cost": finalOrder["total-cost"],
           "down-payment": finalOrder["down-payment"],
           "layout-fee": finalOrder["layout-fee"],
+          "discount":finalOrder.discount,
           "remaining-balance": finalOrder["remaining-balance"],
           admin: finalOrder.admin,
           date: finalOrder.date,

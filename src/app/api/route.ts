@@ -112,9 +112,11 @@ interface FinalOrderData extends FormData {
   subtotal: string;
   "shipping-fee": string;
   "package-box": string;
+  "tax":string;
   "total-cost": string;
   "down-payment": string;
   "layout-fee": string;
+  "discount":string;
   "remaining-balance": string;
   [key: `product${number}` | `size${number}` | `quantity${number}` | `price${number}` | `total${number}`]: string | number;
 }
@@ -141,9 +143,11 @@ export async function POST(req: NextRequest) {
           body.subtotal,
           body["shipping-fee"],
           body["package-box"],
+          body.tax,
           body["total-cost"],
           body["down-payment"],
           body["layout-fee"],
+          body.discount,
           body["remaining-balance"],
           body.admin,
           body.date

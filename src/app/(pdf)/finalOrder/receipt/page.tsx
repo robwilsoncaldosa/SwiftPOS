@@ -4,10 +4,15 @@ import { Button } from "@/components/ui/button";
 
 /* eslint-disable react/no-deprecated */
 import {
-    PDFViewer,
     StyleSheet,
     View
 } from "@react-pdf/renderer";
+
+import dynamic from 'next/dynamic';
+
+const PDFViewer = dynamic(() => import('@react-pdf/renderer').then(mod => mod.PDFViewer), {
+  ssr: false,
+});
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
