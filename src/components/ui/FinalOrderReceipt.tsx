@@ -128,12 +128,14 @@ function FinalOrderReceipt({ data }: { data: FinalOrderData }) {
         product: data[`product${index}`],
         // Parse sizes and quantities into arrays by splitting on commas
         //@ts-ignore
-
         size: data[`size${index}`] ? data[`size${index}`].split(",") : [],
-        //@ts-ignore
 
+        //@ts-ignore
+        
         quantity: data[`quantity${index}`]
-          ? data[`quantity${index}`].split(",")
+          ? 
+        //   @ts-ignore
+          data[`quantity${index}`].split(",")
           : [],
         //@ts-ignore
 

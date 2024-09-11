@@ -132,6 +132,7 @@ const Example = async () => {
             <CardDescription>
               Manage your final orders and view their data
             </CardDescription>
+            {/* @ts-ignore */}
             <OrderTable columns={OrderColumns} data={orderData} />
           </Card>
         </TabsContent>
