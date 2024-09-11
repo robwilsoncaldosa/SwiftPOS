@@ -60,7 +60,7 @@ const Example = async () => {
     return undefined;
   })();
 
-  const response = await fetch("http://localhost:3000/api", {
+  const response = await fetch("/api", {
     next: { revalidate: 0 },
     cache: "no-store",
   });
@@ -70,7 +70,7 @@ const Example = async () => {
     data.signature = currentUser?.signature;
   });
 
-  const getOrderData = await fetch("http://localhost:3000/api/finalOrder", {
+  const getOrderData = await fetch("/api/finalOrder", {
     next: { revalidate: 0 },
     cache: "no-store",
   });
@@ -80,7 +80,7 @@ const Example = async () => {
     data.signature = currentUser?.signature;
   });
 
-  const getProductData = await fetch("http://localhost:3000/api/products");
+  const getProductData = await fetch("/api/products");
   const productData = await getProductData.json();
 
   return (

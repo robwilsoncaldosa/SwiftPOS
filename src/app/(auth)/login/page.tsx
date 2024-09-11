@@ -42,13 +42,14 @@ function Login() {
         </div>
       </div>
       <div className="hidden bg-muted lg:block">
-        <Image
-          src="/login_image.jpg"
-          alt="Image"
-          width="1920"
-          height="1080"
-          className="h-full w-full object-cover"
-        />
+            <Image
+                src={"/backgroundlogin.jpg"}
+                alt="Image"
+                width="1920"
+                height="1080"
+                className="h-full w-full object-cover"
+            />
+       
       </div>
     </div>
   );

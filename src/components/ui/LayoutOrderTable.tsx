@@ -27,7 +27,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "./card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
 export const LayoutOrderTable = async () => {
-  const response = await fetch("http://localhost:3000/api",{next:{revalidate:0}});
+  const response = await fetch("/api",{next:{revalidate:0}});
   const datas: FormData[] = await response.json();
 
   const tableHeaders = ["Job Order", "Name", "Phone", "Address", "Page", "Admin", "Products","Total,Date"];
