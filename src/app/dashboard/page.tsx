@@ -32,6 +32,8 @@ import { columns } from "./layout/columns";
 import { columns as OrderColumns } from "./finalOrder/columns";
 import { columns as ProductColumns } from "./products/columns";
 
+
+
 const Example = async () => {
   interface OrderData extends FormData {
     subTotal: string;
@@ -59,10 +61,10 @@ const Example = async () => {
     }
     return undefined;
   })();
+  const DOMAIN = process.env.DOMAIN
 
-  const response = await fetch("/api", {
+  const response = await fetch(`${DOMAIN}/api`, {
     next: { revalidate: 0 },
-    cache: "no-store",
   });
 
   const datas: FormData[] = await response.json();
@@ -70,7 +72,7 @@ const Example = async () => {
     data.signature = currentUser?.signature;
   });
 
-  const getOrderData = await fetch("/api/finalOrder", {
+  const getOrderData = await fetch(`${DOMAIN}/api/finalOrder`, {
     next: { revalidate: 0 },
     cache: "no-store",
   });
@@ -80,7 +82,7 @@ const Example = async () => {
     data.signature = currentUser?.signature;
   });
 
-  const getProductData = await fetch("/api/products");
+  const getProductData = await fetch(`${DOMAIN}/api/products`);
   const productData = await getProductData.json();
 
   return (
