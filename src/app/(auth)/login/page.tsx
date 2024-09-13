@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { login } from "@/app/lib";
 import { redirect } from "next/navigation";
 function Login() {
+    const DOMAIN = process.env.DOMAIN;
   return (
     <div className="w-full  lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[951px]">
       <div className="flex items-center justify-center py-12">
@@ -43,7 +44,7 @@ function Login() {
       </div>
       <div className="hidden bg-muted lg:block">
             <Image
-                src={"/backgroundlogin.jpg"}
+                src={'/images/login_image.jpg'}
                 alt="Image"
                 width="1920"
                 height="1080"

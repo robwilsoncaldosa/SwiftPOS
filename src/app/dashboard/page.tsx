@@ -74,7 +74,6 @@ const Example = async () => {
 
   const getOrderData = await fetch(`${DOMAIN}/api/finalOrder`, {
     next: { revalidate: 0 },
-    cache: "no-store",
   });
 
   const orderData: OrderData[] = await getOrderData.json();
