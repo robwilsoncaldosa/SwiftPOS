@@ -1,5 +1,6 @@
 'use server'
 
+import { notFound, redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import {   type NextRequest, NextResponse } from 'next/server';
 
@@ -21,7 +22,8 @@ export async function login(formData: FormData) {
 
   if (!isValid) {
     // If credentials are invalid, redirect to login page
-throw new Error("Invalid username or password. Please refresh to restart");}
+     notFound();
+    }
 
   // Create a session string (no encryption)
 
@@ -36,6 +38,7 @@ throw new Error("Invalid username or password. Please refresh to restart");}
   // Save the session in a cookie with a long expiration date
   cookies().set("session", session, { expires, httpOnly: true });
   // Redirect to home page after successful login
+  redirect("/dashboard");
 }
 
 export async function logout() {

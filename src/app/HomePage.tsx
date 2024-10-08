@@ -43,11 +43,57 @@ export const HomePage = ({ Admin }: { Admin: string }) => {
     return true;
   };
 
+  const handleReset = () => {
+    setTextareaValue("Name of client: \nTotal:\nPage:\nPhone: \nDate: \nProducts:\nAddress:");
+    setFormData({
+      name: "",
+      address: "",
+      admin: "",
+      date: "",
+      page: "",
+      phone: "",
+      products: "",
+      total: "",
+    });
+  };
+  const [textareaValue, setTextareaValue] = useState<string>("Name of client: \nTotal:\nPage:\nPhone: \nDate: \nProducts:\nAddress:");
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    address: "",
+    date: "",
+    page: "",
+    phone: "",
+    products: "",
+    total: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!checkFormData(formData)) {
+
+    // Create a list to store error messages
+    const errors: string[] = [];
+
+    // Check each field and add to errors if needed
+    if (!formData.name) errors.push("Name is required");
+    if (!formData.phone) errors.push("Phone number is required");
+    if (!formData.address) errors.push("Address is required");
+    if (!formData.page) errors.push("Page is required");
+    if (!formData.products) errors.push("Products are required");
+    if (!formData.total) errors.push("Total is required");
+    if (!formData.date) errors.push("Date is required");
+
+    // If there are errors, display them and return
+    if (errors.length > 0) {
+      const errorMessage = errors.join(", ");
+      console.log("Form errors:", errorMessage);
+      toast({
+        description: `Please fix the following errors: ${errorMessage}`,
+        variant: "destructive",
+      });
       return;
     }
+
     setIsSubmitting(true);
     const data: FormData = {
       name: formData.name,
@@ -61,6 +107,7 @@ export const HomePage = ({ Admin }: { Admin: string }) => {
     };
 
     try {
+      console.log("Submitting form data:", data);
       const response = await fetch("/dashboard/api", {
         method: "POST",
         headers: {
@@ -69,40 +116,32 @@ export const HomePage = ({ Admin }: { Admin: string }) => {
         },
         body: JSON.stringify(data),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log("Server response:", responseData);
+
       setIsSubmitting(false);
-      setIsSuccess(!!response.ok);
-      response.ok && handleReset();
+      setIsSuccess(true);
+      handleReset();
+      toast({
+        description: <SuccessToast />,
+        className: "bg-green-500 text-white transition",
+      });
     } catch (error) {
-      console.error(error);
+      console.error("Error submitting form:", error);
+      setIsSubmitting(false);
+      setIsSuccess(false);
+      toast({
+        description: "An error occurred while submitting the form",
+        variant: "destructive",
+      });
     }
   };
 
-  const [textareaValue, setTextareaValue] = useState<string>("");
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    address: "",
-    date: "",
-    page: "",
-    phone: "",
-    products: "",
-    total: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
-
-  const handleReset = () => {
-    setTextareaValue("");
-    setFormData({
-      name: "",
-      address: "",
-      admin: "",
-      date: "",
-      page: "",
-      phone: "",
-      products: "",
-      total: "",
-    });
-  };
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setTextareaValue(value);
@@ -117,31 +156,28 @@ export const HomePage = ({ Admin }: { Admin: string }) => {
       switch (key) {
         case "name of client":
           parsedData.name = val;
-
           break;
         case "address":
           parsedData.address = val;
-
           break;
         case "page":
           parsedData.page = val;
           break;
         case "products":
           parsedData.products = val;
-
           break;
         case "total":
           parsedData.total = val;
-
           break;
         case "date":
           parsedData.date = val;
-
           break;
+        case "contact":
+          parsedData.phone = val;
         case "phone":
           parsedData.phone = val;
-
           break;
+
         default:
           break;
       }
@@ -192,6 +228,7 @@ export const HomePage = ({ Admin }: { Admin: string }) => {
                 className="text-foreground h-60"
                 placeholder={`Example Format Below:\n\nName of client: Juan Dela Cruz\nTotal: ₱1,000\nPage: VSY\nPhone: 0912345678\nDate: August 22, 2024\nProducts: T-Shirt, Polo-Shirt, Jacket\nAddress: Lapu-lapu City, Cebu, Philippines`}
                 value={textareaValue}
+                defaultValue={textareaValue}
                 onChange={handleTextareaChange}
                 required
               />

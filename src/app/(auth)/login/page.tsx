@@ -18,11 +18,7 @@ function Login() {
             </p>
           </div>
           <form
-            action={async (formData: FormData) => {
-              "use server";
-              await login(formData);
-              redirect("/dashboard");
-            }}
+            action={login}
           >
             <div className="grid gap-4">
               <div className="grid gap-2">
